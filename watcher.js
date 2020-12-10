@@ -13,7 +13,7 @@ const driver = new webdriver.Builder()
     .build();
 
 const WebSocket = require('ws');
-const ws = new WebSocket("ws://192.168.1.2:8081");
+const ws = new WebSocket("ws://192.168.1.18:8081");
 const found = {};
 
 if (strategy === 'bestbuy') {
@@ -32,7 +32,7 @@ async function watchNE() {
     }
   } catch (e) {
     console.info(e);
-  } finally() {
+  } finally {
     return setTimeout(watchNE, 3000);
   }
 }
@@ -40,15 +40,15 @@ async function watchNE() {
 async function watchBB() {
   await driver.get(url)
   try {
-  let btn = await driver.findElement(By.className("btn btn-disabled btn-lg btn-block add-to-cart-button"))
-  let text = await btn.getText();
-  if (text === 'Coming Soon' || text === 'Sold Out') {
-  } else {
-    ws.send(JSON.stringify({url: url, strategy: strategy}));
-  }
+    let btn = await driver.findElement(By.className("btn btn-disabled btn-lg btn-block add-to-cart-button"))
+    let text = await btn.getText();
+    if (text === 'Coming Soon' || text === 'Sold Out') {
+    } else {
+      ws.send(JSON.stringify({url: url, strategy: strategy}));
+    }
   } catch(e) {
     console.info(e);
-  } finally() {
+  } finally {
     return setTimeout(watchBB, 3000);
   }
 }

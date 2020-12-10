@@ -2,7 +2,8 @@ const ws = require('ws');
 const moment = require('moment');
 const Discord = require("discord.js");
 
-const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
+//const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
+const DISCORD_BOT_TOKEN = "NzgyOTQ1NTM4ODIzMTU5ODMw.X8Tk2g.eWEEV7JkDGNuPuCXAsmYYSs6gVI";
 const WebSocketServer = ws.Server;
 const wss = new WebSocketServer({ port: 8081 });
 const bot = new Discord.Client();
