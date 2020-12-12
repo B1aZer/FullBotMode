@@ -1,24 +1,34 @@
 const axios = require('axios');
 const config = require('./config.js');
+const Discord = require("discord.js");
 
+const DISCORD_BOT_TOKEN = config.DISCORD_BOT_TOKEN;
+const bot = new Discord.Client();
+
+bot.login(DISCORD_BOT_TOKEN);
 run();
 
-//(async () => {
-//})();
-
-async function run() {
+function run() {
   for (let item of config.items) {
-    console.info(item);
+    constructReq(item);
   }
 }
 
-async function req(url, id) {
+function constructReq(item) {
   try {
-    const response = await axios.get('https://www.newegg.com/product/api/ProductRealtime?ItemNumber=' + id + '&RecommendItem=&BestSellerItemList=&IsVATPrice=true');
-    console.log(response.data.MainItem.Instock);
-  } catch (error) {
-    console.log(error.response.body);
+    let inStock = req(item.id);
+    if (inStock) {
+      bot.channels.cache.get("765951948162859022").send(item.url);
+    }
+  } catch (e) {
+    console.warn(e);
   } finally {
-    setTimeout(req(url, id), config.interval);
+    setTimeout(constructReq.bind(null, item), config.interval);
   }
+}
+
+
+async function req(id) {
+  const response = await axios.get('https://www.newegg.com/product/api/ProductRealtime?ItemNumber=' + id + '&RecommendItem=&BestSellerItemList=&IsVATPrice=true');
+  return response.data.MainItem.Instock;
 }
