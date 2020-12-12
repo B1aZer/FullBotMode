@@ -1,6 +1,6 @@
 require('chromedriver');
 const WebSocket = require('ws');
-const ws = new WebSocket("ws://192.168.1.2:8081");
+const ws = new WebSocket("ws://192.168.1.18:8081");
 const webdriver = require('selenium-webdriver'),
     By = webdriver.By,
     until = webdriver.until;

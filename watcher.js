@@ -86,7 +86,7 @@ function checkPrice(title, price) {
       return true;
     }
   }
-  if (title.includes(3070)) {
+  else if (title.includes(3070)) {
     if (price <= 550) {
       return true;
     }
