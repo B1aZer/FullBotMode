@@ -23,31 +23,51 @@ if (strategy === 'bestbuy') {
 }
 
 async function watchNE() {
-  await driver.get(url)
   try {
+    await driver.get(url)
     let btn = await driver.findElement(By.className("btn btn-primary btn-wide"))
     let text = await btn.getText();
+    let title = await driver.getTitle();
+    let priceEl = await driver.findElement(By.className('price-current'))
+    let priceText = await priceEl.getText();
+    let price = parseInt(priceText.replace(',','').replace('$',''));
     if (text.trim() === 'Add to cart') {
-      ws.send(JSON.stringify({url: url, strategy: strategy}));
+      console.info('available');
+      if (checkPrice(title, price)) {
+        ws.send(JSON.stringify({url: url, strategy: strategy}));
+      } else {
+        console.info('price does not match');
+        console.info(title);
+        console.info(price);
+      }
     }
   } catch (e) {
-    console.info(e);
   } finally {
     return setTimeout(watchNE, 3000);
   }
 }
 
 async function watchBB() {
-  await driver.get(url)
   try {
+    await driver.get(url)
     let btn = await driver.findElement(By.className("btn btn-disabled btn-lg btn-block add-to-cart-button"))
     let text = await btn.getText();
+    let title = await driver.getTitle();
+    let priceEl = await driver.findElement(By.className("priceView-hero-price"))
+    let priceText = await priceEl.getText();
+    let price = parseInt(priceText.replace(',','').replace('$',''));
     if (text === 'Coming Soon' || text === 'Sold Out') {
     } else {
-      ws.send(JSON.stringify({url: url, strategy: strategy}));
+      console.info('available');
+      if (checkPrice(title, price)) {
+        ws.send(JSON.stringify({url: url, strategy: strategy}));
+      } else {
+        console.info('price mismatch');
+        console.info(title);
+        console.info(price);
+      }
     }
   } catch(e) {
-    console.info(e);
   } finally {
     return setTimeout(watchBB, 3000);
   }
@@ -58,5 +78,29 @@ function getDomainName(url) {
     if (hostName === 'localhost') return hostName;
     let host = hostName.split('.');
     return host[1];
+}
+
+function checkPrice(title, price) {
+  if (title.includes(3070)) {
+    if (price <= 550) {
+      return true;
+    }
+  }
+  else if (title.includes(3060)) {
+    if (price <= 450) {
+      return true;
+    }
+  }
+  else if (title.includes(5600)) {
+    if (price <= 400) {
+      return true;
+    }
+  }
+  else if (title.includes('PlayStation')) {
+    if (price <= 600) {
+      return true;
+    }
+  }
+  return false;
 }
 
