@@ -1,7 +1,7 @@
 const axios = require('axios');
 const WebSocket = require('ws');
 const ws = new WebSocket("ws://192.168.1.18:8081");
-const config = require('./config.js');
+const config = require('./config1.js');
 const utils = require('./utils.js');
 const found = new Map();
 const moment = require('moment');
@@ -36,18 +36,20 @@ async function constructReq(item) {
     }
   } catch (e) {
     if (e.response) {
- 	if (e.response.status == 503) {
-	  console.error('Newegg 503 (service unavailable) Error. Interval possibly too low. Consider increasing interval rate.')
-        } else {
-          console.warn(moment().format() + ': ' + e.response.status);
-        }
+      if (e.response.status == 503) {
+        console.error('Newegg 503 (service unavailable) Error. Interval possibly too low. Consider increasing interval rate.')
+      } else if (e.response.status == 403) {
+        console.warn(moment().format() + ': ' + e.response.status);
+      } else {
+        console.warn(moment().format() + ': ' + e.response.status);
+      }
     } else if (e.errno) {
       console.warn(moment().format() + ': ' + e.errno);
     } else {
       console.error(e);
     }
   } finally {
-    setTimeout(constructReq.bind(null, item), Math.random() * config.interval +  config.interval + config.interval);
+    setTimeout(constructReq.bind(null, item), config.interval);
   }
 }
 
