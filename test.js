@@ -5,6 +5,16 @@ const config = require('./config1.js');
 const utils = require('./utils.js');
 const found = new Map();
 const moment = require('moment');
+const failedAttempt = 0;
+
+const args = process.argv.slice(2);
+let service = 'axios';
+if (args.length) {
+  // tor
+  service = args[0];
+}
+const tor = require('tor-request');
+tor.TorControlPort.password = config.TOR_PASSWORD;
 
 run();
 
@@ -18,6 +28,7 @@ async function constructReq(item) {
   try {
     let itemJSON = await req(item.id);
     if (!itemJSON) {console.error(itemJSON); return; }
+    failedAttempt = 0;
     if (itemJSON.Instock) {
       if (itemJSON.UnitCost <= item.price) {
           console.info('hooray');
@@ -40,6 +51,10 @@ async function constructReq(item) {
         console.error('Newegg 503 (service unavailable) Error. Interval possibly too low. Consider increasing interval rate.')
       } else if (e.response.status == 403) {
         console.warn(moment().format() + ': ' + e.response.status);
+	failedAttempt += 1;
+	if (failedAttempt > 5) {
+		// change ip
+	}
       } else {
         console.warn(moment().format() + ': ' + e.response.status);
       }
@@ -55,10 +70,18 @@ async function constructReq(item) {
 
 
 async function req(id) {
-  const response = await axios.get('https://www.newegg.com/product/api/ProductRealtime?ItemNumber=' + id + '&RecommendItem=&BestSellerItemList=&IsVATPrice=true', {
-    headers: {
-      'User-Agent': config.userAgents[Math.floor(Math.random() * config.userAgents.length)],
-    },
-  });
+  let response;
+  if (service === 'tor') {
+    response = await tor.request({ url: 'https://www.newegg.com/product/api/ProductRealtime?ItemNumber=' + id + '&RecommendItem=&BestSellerItemList=&IsVATPrice=true', headers: {
+        'user-agent': config.userAgents[Math.floor(Math.random() * config.userAgents.length)],
+    }});
+	  console.info(response);
+  } else {
+    response = await axios.get('https://www.newegg.com/product/api/ProductRealtime?ItemNumber=' + id + '&RecommendItem=&BestSellerItemList=&IsVATPrice=true', {
+      headers: {
+        'User-Agent': config.userAgents[Math.floor(Math.random() * config.userAgents.length)],
+      },
+    });
+  }
   return response.data.MainItem;
 }

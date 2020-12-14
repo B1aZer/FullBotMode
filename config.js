@@ -3,6 +3,7 @@ require('dotenv').config()
 
 module.exports = {
     DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN,
+    TOR_PASSWORD: process.env.TOR_PASSWORD,
     items: [
       {
         url: "https://www.newegg.com/msi-geforce-rtx-3060-ti-rtx-3060-ti-ventus-2x-oc/p/N82E16814137612?Item=N82E16814137612&Description=rtx%203060%20ti&cm_re=rtx_3060%20ti-_-14-137-612-_-Product",
