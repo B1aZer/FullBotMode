@@ -9,12 +9,13 @@ const failedAttempt = 0;
 
 const args = process.argv.slice(2);
 let service = 'axios';
+let tor;
 if (args.length) {
   // tor
   service = args[0];
+  tor = require('tor-request');
+  tor.TorControlPort.password = config.TOR_PASSWORD;
 }
-const tor = require('tor-request');
-tor.TorControlPort.password = config.TOR_PASSWORD;
 
 run();
 
@@ -72,10 +73,11 @@ async function constructReq(item) {
 async function req(id) {
   let response;
   if (service === 'tor') {
-    response = await tor.request({ url: 'https://www.newegg.com/product/api/ProductRealtime?ItemNumber=' + id + '&RecommendItem=&BestSellerItemList=&IsVATPrice=true', headers: {
-        'user-agent': config.userAgents[Math.floor(Math.random() * config.userAgents.length)],
-    }});
-	  console.info(response);
+    response = tor.request({ url: 'https://www.newegg.com/product/api/ProductRealtime?ItemNumber=' + id + '&RecommendItem=&BestSellerItemList=&IsVATPrice=true', headers: {
+        'User-Agent': config.userAgents[Math.floor(Math.random() * config.userAgents.length)],
+    }}, function ( err, response, body ) {
+      console.info(body);
+    });
   } else {
     response = await axios.get('https://www.newegg.com/product/api/ProductRealtime?ItemNumber=' + id + '&RecommendItem=&BestSellerItemList=&IsVATPrice=true', {
       headers: {
